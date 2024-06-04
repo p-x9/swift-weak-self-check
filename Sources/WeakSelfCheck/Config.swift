@@ -10,7 +10,8 @@ import Foundation
 import WeakSelfCheckCore
 
 public struct Config: Codable {
-    public var reportType: ReportType = .warning
-    public var slent: Bool = false
-    public var whiteList: [WhiteListElement] = []
+    public var reportType: ReportType?
+    public var slent: Bool?
+    public var whiteList: [WhiteListElement]?
+    public var excludedFiles: [String]?
 }

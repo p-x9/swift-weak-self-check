@@ -9,7 +9,7 @@
 import Foundation
 
 extension String {
-    func matches(pattern: String) -> Bool {
+    package func matches(pattern: String) -> Bool {
         let predicate = NSPredicate(format: "SELF LIKE %@", pattern)
         return predicate.evaluate(with: self)
     }

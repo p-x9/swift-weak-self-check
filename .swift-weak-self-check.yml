@@ -5,3 +5,5 @@ whiteList:
       functionName: "async*"
     - parentPattern: "DispatchQueue.*"
       functionName: "sync*"
+excludedFiles:
+    - "*/.build/*"

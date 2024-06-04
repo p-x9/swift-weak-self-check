@@ -30,6 +30,7 @@ struct weak_self_check: ParsableCommand {
     var config: String = ".swift-weak-self-check.yml"
 
     var whiteList: [WhiteListElement] = []
+    var excludedFiles: [String] = []
 
     mutating func run() throws {
         try readConfig()
@@ -53,7 +54,7 @@ extension weak_self_check {
             at: url,
             includingPropertiesForKeys: nil
         )
-        try contents
+        try? contents
             .forEach {
                 if $0.pathExtension == "swift" {
                     try check(forFile: $0)
@@ -65,6 +66,9 @@ extension weak_self_check {
 
     private func check(forFile url: URL) throws {
         guard url.pathExtension == "swift" else { return }
+        guard !excludedFiles.contains(where: { url.path.matches(pattern: $0) }) else {
+            return
+        }
         if !silent {
             print("[weak self check] checking: \(url.relativePath)")
         }
@@ -74,7 +78,7 @@ extension weak_self_check {
             reportType: reportType ?? .error,
             whiteList: whiteList
         )
-        try checker.diagnose()
+        try? checker.diagnose()
     }
 }
 
@@ -89,9 +93,10 @@ extension weak_self_check {
         let data = try Data(contentsOf: url)
         let config = try decoder.decode(Config.self, from: data)
 
-        self.whiteList = config.whiteList
+        self.whiteList = config.whiteList ?? []
+        self.excludedFiles = config.excludedFiles ?? []
 
-        if config.slent {
+        if let slient = config.slent, slient {
             self.silent = true
         }
         if reportType == nil {
