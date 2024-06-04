@@ -56,6 +56,11 @@ fileprivate final class _ClosureWeakSelfCheckerSyntaxVisitor: SyntaxVisitor {
             }
         }
 
+        if let isInReferencetype = node.isInReferencetype,
+           !isInReferencetype {
+            return .skipChildren
+        }
+
         self.isValid = false
 
         return .skipChildren
