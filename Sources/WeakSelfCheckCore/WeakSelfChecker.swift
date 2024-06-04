@@ -18,7 +18,7 @@ public final class WeakSelfChecker: SyntaxVisitor {
     public init(
         fileName: String,
         reportType: ReportType = .error,
-        whiteList: [WhiteListElement] = [.init(parentPattern: "DispatchQueue.*", functionName: "async")]
+        whiteList: [WhiteListElement] = []
     ) {
         self.fileName = fileName
         self.reportType = reportType
