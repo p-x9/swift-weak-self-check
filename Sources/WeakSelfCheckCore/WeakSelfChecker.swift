@@ -13,18 +13,25 @@ import SwiftSyntax
 public final class WeakSelfChecker: SyntaxVisitor {
     public let fileName: String
     public let reportType: ReportType
+    public let whiteList: [WhiteListElement]
 
     public init(
         fileName: String,
-        reportType: ReportType = .error
+        reportType: ReportType = .error,
+        whiteList: [WhiteListElement] = [.init(parentPattern: "DispatchQueue.*", functionName: "async")]
     ) {
         self.fileName = fileName
         self.reportType = reportType
+        self.whiteList = whiteList
 
         super.init(viewMode: .all)
     }
 
     public override func visit(_ node: FunctionCallExprSyntax) -> SyntaxVisitorContinueKind {
+        guard !checkIfContainsInWhiteList(node) else {
+            return .visitChildren
+        }
+
 #if canImport(SwiftSyntax510)
         let arguments = node.arguments
 #else
@@ -78,5 +85,33 @@ extension WeakSelfChecker {
             type: reportType,
             content: "Use `[weak self]` to avoid memory leaks"
         )
+    }
+}
+
+extension WeakSelfChecker {
+    private func checkIfContainsInWhiteList(_ node: FunctionCallExprSyntax) -> Bool {
+        guard !whiteList.isEmpty else {
+            return false
+        }
+
+        let calledExpression = node.calledExpression
+
+        if let function = calledExpression.as(DeclReferenceExprSyntax.self) {
+            return !whiteList
+                .lazy
+                .filter({ $0.parentPattern == nil })
+                .filter({ function.trimmed.description.matches(pattern: $0.functionName) })
+                .isEmpty
+        }
+
+        if let memberAccess = calledExpression.as(MemberAccessExprSyntax.self) {
+            let target = memberAccess.chainedMemberNames.joined(separator: ".")
+            return !whiteList
+                .lazy
+                .filter({ target.matches(pattern: $0.pattern) })
+                .isEmpty
+        }
+
+        return false
     }
 }
