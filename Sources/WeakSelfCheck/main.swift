@@ -19,6 +19,9 @@ struct weak_self_check: ParsableCommand {
     @Argument
     var reportType: ReportType = .error
 
+    @Flag
+    var silent: Bool = false
+
     mutating func run() throws {
         let path = self.path ?? FileManager.default.currentDirectoryPath
         let url = URL(fileURLWithPath: path)
@@ -51,7 +54,9 @@ extension weak_self_check {
 
     private func check(forFile url: URL) throws {
         guard url.pathExtension == "swift" else { return }
-        print("[weak self check] checking: \(url.lastPathComponent)")
+        if !silent {
+            print("[weak self check] checking: \(url.relativePath)")
+        }
 
         let checker = WeakSelfChecker(fileName: url.path)
         try checker.diagnose()
