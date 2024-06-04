@@ -11,7 +11,8 @@ struct weak_self_check: ParsableCommand {
     )
 
     @Option(
-        help: "Path"
+        help: "Path",
+        completion: .directory
     )
     var path: String?
 
