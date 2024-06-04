@@ -7,3 +7,5 @@ whiteList:
       functionName: "sync*"
 excludedFiles:
     - "*/.build/*"
+    - "*/vendor/bundle/*"
+    - "*/Pods/*"
