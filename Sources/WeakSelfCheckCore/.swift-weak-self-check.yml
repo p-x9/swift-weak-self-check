@@ -1,0 +1,7 @@
+reportType: error
+slent: true
+whiteList:
+    - parentPattern: "DispatchQueue.*"
+      functionName: "async*"
+    - parentPattern: "DispatchQueue.*"
+      functionName: "sync*"

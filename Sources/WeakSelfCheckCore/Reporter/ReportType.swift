@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum ReportType: String {
+public enum ReportType: String, Codable {
     case warning
     case error
 }

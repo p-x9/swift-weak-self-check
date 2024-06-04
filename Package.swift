@@ -22,12 +22,17 @@ let package = Package(
             url: "https://github.com/apple/swift-syntax.git",
             "509.0.0"..<"511.0.0"
         ),
+        .package(
+            url: "https://github.com/jpsim/Yams.git",
+            from: "5.0.1"
+        ),
     ],
     targets: [
         .executableTarget(
             name: "WeakSelfCheck",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Yams", package: "Yams"),
                 "WeakSelfCheckCore"
             ]
         ),
