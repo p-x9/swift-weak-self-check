@@ -5,6 +5,11 @@ whiteList:
       functionName: "async*"
     - parentPattern: "DispatchQueue.*"
       functionName: "sync*"
+    - parentPattern: "UIView"
+      functionName: "animate"
+    - parentPattern: "Task"
+      functionName: "*"
+    - functionName: "Task"
 excludedFiles:
     - "*/.build/*"
     - "*/vendor/bundle/*"
