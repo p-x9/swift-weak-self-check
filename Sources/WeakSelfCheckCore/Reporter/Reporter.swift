@@ -9,11 +9,6 @@
 import Foundation
 
 enum Reporter {
-    enum ReportType: String {
-        case warning
-        case error
-    }
-
     static func report(
         file: String,
         line: Int,

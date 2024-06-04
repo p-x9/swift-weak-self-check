@@ -15,6 +15,9 @@ struct weak_self_check: ParsableCommand {
     )
     var path: String?
 
+    @Argument
+    var reportType: ReportType = .error
+
     mutating func run() throws {
         let path = self.path ?? FileManager.default.currentDirectoryPath
         let url = URL(fileURLWithPath: path)

@@ -12,9 +12,15 @@ import SwiftSyntax
 
 public final class WeakSelfChecker: SyntaxVisitor {
     public let fileName: String
+    public let reportType: ReportType
 
-    public init(fileName: String) {
+    public init(
+        fileName: String,
+        reportType: ReportType = .error
+    ) {
         self.fileName = fileName
+        self.reportType = reportType
+
         super.init(viewMode: .all)
     }
 
@@ -69,7 +75,7 @@ extension WeakSelfChecker {
             file: fileName,
             line: location.line,
             character: location.column,
-            type: .error,
+            type: reportType,
             content: "Use `[weak self]` to avoid memory leaks"
         )
     }
