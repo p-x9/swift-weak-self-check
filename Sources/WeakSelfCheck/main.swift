@@ -11,13 +11,13 @@ struct weak_self_check: ParsableCommand {
         helpNames: [.long, .short]
     )
 
-    @Option(
+    @Argument(
         help: "Path",
         completion: .directory
     )
     var path: String?
 
-    @Argument(help: "Detected as `error` or `warning` [default: error]")
+    @Option(help: "Detected as `error` or `warning` [default: error]")
     var reportType: ReportType?
 
     @Flag(name: .customLong("silent"), help: "Do not output logs")

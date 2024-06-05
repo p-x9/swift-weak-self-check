@@ -14,13 +14,14 @@ A CLI tool for `[weak self]` detection by `swift-syntax`
 ```
 OVERVIEW: Check whether `self` is captured by weak reference in Closure.
 
-USAGE: weak-self-check [--path <path>] [<report-type>] [--silent] [--config <config>]
+USAGE: weak-self-check [<path>] [--report-type <report-type>] [--silent] [--config <config>]
 
 ARGUMENTS:
-  <report-type>           Detected as `error` or `warning` [default: error]
+  <path>                  Path
 
 OPTIONS:
-  --path <path>           Path
+  --report-type <report-type>
+                          Detected as `error` or `warning` [default: error]
   --silent                Do not output logs
   --config <config>       Config (default: .swift-weak-self-check.yml)
   -h, --help              Show help information.
