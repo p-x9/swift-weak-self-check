@@ -17,7 +17,7 @@ struct weak_self_check: ParsableCommand {
     )
     var path: String?
 
-    @Option(help: "Detected as `error` or `warning` [default: error]")
+    @Option(help: "Detected as `error` or `warning` (default: error)")
     var reportType: ReportType?
 
     @Flag(name: .customLong("silent"), help: "Do not output logs")
