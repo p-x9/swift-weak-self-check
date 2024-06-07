@@ -10,7 +10,7 @@ let package = Package(
     products: [
         .executable(
             name: "weak-self-check",
-            targets: ["WeakSelfCheck"]
+            targets: ["weak-self-check"]
         )
     ],
     dependencies: [
@@ -29,7 +29,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "WeakSelfCheck",
+            name: "weak-self-check",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Yams", package: "Yams"),
