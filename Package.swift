@@ -10,8 +10,12 @@ let package = Package(
     products: [
         .executable(
             name: "weak-self-check",
-            targets: ["WeakSelfCheck"]
-        )
+            targets: ["weak-self-check"]
+        ),
+        .plugin(
+            name: "WeakSelfCheckCommandPlugin",
+            targets: ["WeakSelfCheckCommandPlugin"]
+        ),
     ],
     dependencies: [
         .package(
@@ -29,7 +33,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "WeakSelfCheck",
+            name: "weak-self-check",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Yams", package: "Yams"),
@@ -41,6 +45,19 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax")
+            ]
+        ),
+        .plugin(
+            name: "WeakSelfCheckCommandPlugin",
+            capability: .command(
+                intent: .custom(
+                    verb: "weak-self-check",
+                    description: "Check whether `self` is captured by weak reference in Closure."
+                ),
+                permissions: []
+            ),
+            dependencies: [
+                "weak-self-check"
             ]
         )
     ]
