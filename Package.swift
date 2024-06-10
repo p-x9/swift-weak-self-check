@@ -13,6 +13,10 @@ let package = Package(
             targets: ["weak-self-check"]
         ),
         .plugin(
+            name: "WeakSelfCheckBuildToolPlugin",
+            targets: ["WeakSelfCheckBuildToolPlugin"]
+        ),
+        .plugin(
             name: "WeakSelfCheckCommandPlugin",
             targets: ["WeakSelfCheckCommandPlugin"]
         ),
@@ -45,6 +49,13 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax")
+            ]
+        ),
+        .plugin(
+            name: "WeakSelfCheckBuildToolPlugin",
+            capability: .buildTool(),
+            dependencies: [
+                "weak-self-check"
             ]
         ),
         .plugin(
