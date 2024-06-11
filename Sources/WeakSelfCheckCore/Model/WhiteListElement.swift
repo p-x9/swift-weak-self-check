@@ -17,13 +17,3 @@ public struct WhiteListElement: Codable {
         self.functionName = functionName
     }
 }
-
-extension WhiteListElement {
-    var pattern: String {
-        if let parentPattern {
-            "\(parentPattern).\(functionName)"
-        } else {
-            functionName
-        }
-    }
-}
