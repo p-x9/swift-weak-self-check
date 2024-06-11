@@ -8,17 +8,35 @@
 
 import Foundation
 import SwiftSyntax
+import SwiftIndexStore
 
 public enum ClosureWeakSelfChecker {
-    public static func check(_ node: ClosureExprSyntax) -> Bool {
-        let visitor = _ClosureWeakSelfCheckerSyntaxVisitor(viewMode: .all)
+    public static func check(
+        _ node: ClosureExprSyntax,
+        in fileName: String,
+        indexStore: IndexStore? = nil
+    ) -> Bool {
+        let visitor = _ClosureWeakSelfCheckerSyntaxVisitor(
+            fileName: fileName,
+            indexStore: indexStore
+        )
         visitor.walk(node)
         return visitor.isValid
     }
 }
 
 fileprivate final class _ClosureWeakSelfCheckerSyntaxVisitor: SyntaxVisitor {
+
+    let fileName: String
+    let indexStore: IndexStore?
+
     public private(set) var isValid: Bool = true
+
+    init(fileName: String, indexStore: IndexStore?) {
+        self.fileName = fileName
+        self.indexStore = indexStore
+        super.init(viewMode: .all)
+    }
 
     override func visit(_ node: ClosureExprSyntax) -> SyntaxVisitorContinueKind {
         let statements = node.statements
@@ -56,7 +74,10 @@ fileprivate final class _ClosureWeakSelfCheckerSyntaxVisitor: SyntaxVisitor {
             }
         }
 
-        if let isInReferencetype = node.isInReferencetype,
+        if let isInReferencetype = try? node.isInReferenceType(
+            in: fileName,
+            indexStore: indexStore
+        ),
            !isInReferencetype {
             return .skipChildren
         }

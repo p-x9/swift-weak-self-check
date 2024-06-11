@@ -29,6 +29,12 @@ struct weak_self_check: ParsableCommand {
     )
     var config: String = ".swift-weak-self-check.yml"
 
+    @Option(
+        help: "Path for IndexStore",
+        completion: .directory
+    )
+    var indexStorePath: String?
+
     var whiteList: [WhiteListElement] = []
     var excludedFiles: [String] = []
 
@@ -76,7 +82,8 @@ extension weak_self_check {
         let checker = WeakSelfChecker(
             fileName: url.path,
             reportType: reportType ?? .error,
-            whiteList: whiteList
+            whiteList: whiteList,
+            indexStorePath: indexStorePath ?? environmentIndexStorePath
         )
         try? checker.diagnose()
     }
@@ -102,6 +109,19 @@ extension weak_self_check {
         if reportType == nil {
             self.reportType = config.reportType
         }
+    }
+}
+
+extension weak_self_check {
+    var environmentIndexStorePath: String? {
+        let environment = ProcessInfo.processInfo.environment
+        guard let buildDir = environment["BUILD_DIR"] else { return nil }
+        let url = URL(fileURLWithPath: buildDir)
+        return url
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Index.noindex/DataStore/")
+            .path()
     }
 }
 

@@ -9,20 +9,31 @@
 import Foundation
 import SwiftParser
 import SwiftSyntax
+import SwiftIndexStore
 
 public final class WeakSelfChecker: SyntaxVisitor {
     public let fileName: String
     public let reportType: ReportType
     public let whiteList: [WhiteListElement]
+    public let indexStore: IndexStore?
 
     public init(
         fileName: String,
         reportType: ReportType = .error,
-        whiteList: [WhiteListElement] = []
+        whiteList: [WhiteListElement] = [],
+        indexStorePath: String? = nil
     ) {
         self.fileName = fileName
         self.reportType = reportType
         self.whiteList = whiteList
+
+        if let indexStorePath,
+           FileManager.default.fileExists(atPath: indexStorePath) {
+            let url = URL(fileURLWithPath: indexStorePath)
+            indexStore = try? .open(store: url, lib: .open())
+        } else {
+            indexStore = nil
+        }
 
         super.init(viewMode: .all)
     }
@@ -42,20 +53,20 @@ public final class WeakSelfChecker: SyntaxVisitor {
             guard let closure = argument.expression.as(ClosureExprSyntax.self) else {
                 continue
             }
-            if !ClosureWeakSelfChecker.check(closure) {
+            if !ClosureWeakSelfChecker.check(closure, in: fileName, indexStore: indexStore) {
                 report(for: closure)
             }
         }
 
         // Check trailing closure
         if let trailingClosure = node.trailingClosure,
-           !ClosureWeakSelfChecker.check(trailingClosure) {
+           !ClosureWeakSelfChecker.check(trailingClosure, in: fileName, indexStore: indexStore) {
             report(for: trailingClosure)
         }
 
         // Check additional trailing closures
         for closure in node.additionalTrailingClosures {
-            if !ClosureWeakSelfChecker.check(closure.closure) {
+            if !ClosureWeakSelfChecker.check(closure.closure, in: fileName, indexStore: indexStore) {
                 report(for: closure.closure)
             }
         }

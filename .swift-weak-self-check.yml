@@ -1,7 +1,7 @@
 reportType: error
 slent: true
 whiteList:
-    - parentPattern: "DispatchQueue\\..*"
+    - parentPattern: "^DispatchQueue\\..*"
       functionName: "^(async|sync).*"
     - parentPattern: "UIView"
       functionName: "animate"
