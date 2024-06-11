@@ -1,16 +1,16 @@
 reportType: error
 slent: true
 whiteList:
-    - parentPattern: "DispatchQueue.*"
-      functionName: "async*"
-    - parentPattern: "DispatchQueue.*"
-      functionName: "sync*"
+    - parentPattern: "DispatchQueue\\..*"
+      functionName: "async.*"
+    - parentPattern: "DispatchQueue\\..*"
+      functionName: "sync.*"
     - parentPattern: "UIView"
       functionName: "animate"
     - parentPattern: "Task"
-      functionName: "*"
+      functionName: ".*"
     - functionName: "Task"
 excludedFiles:
-    - "*/.build/*"
-    - "*/vendor/bundle/*"
-    - "*/Pods/*"
+    - ".*/\\.build/.*"
+    - ".*/vendor/bundle/.*"
+    - ".*/Pods/.*"
