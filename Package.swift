@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "swift-weak-self-check",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v13)
     ],
     products: [
         .executable(
@@ -31,6 +31,10 @@ let package = Package(
             "509.0.0"..<"511.0.0"
         ),
         .package(
+            url: "https://github.com/ileitch/swift-indexstore.git",
+            from: "9.0.4"
+        ),
+        .package(
             url: "https://github.com/jpsim/Yams.git",
             from: "5.0.1"
         ),
@@ -48,7 +52,8 @@ let package = Package(
             name: "WeakSelfCheckCore",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftParser", package: "swift-syntax")
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftIndexStore", package: "swift-indexstore")
             ]
         ),
         .plugin(
