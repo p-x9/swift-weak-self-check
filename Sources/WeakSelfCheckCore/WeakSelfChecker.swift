@@ -105,10 +105,16 @@ extension WeakSelfChecker {
         }
 
         if let memberAccess = calledExpression.as(MemberAccessExprSyntax.self) {
-            let target = memberAccess.chainedMemberNames.joined(separator: ".")
+            var names = memberAccess.chainedMemberNames
+
+            guard let function = names.popLast() else { return false }
+            let parent = names.joined(separator: ".")
+
             return !whiteList
                 .lazy
-                .filter({ target.matches(pattern: $0.pattern) })
+                .filter({
+                    parent.matches(pattern: $0.parentPattern ?? "") && function.matches(pattern: $0.functionName)
+                })
                 .isEmpty
         }
 

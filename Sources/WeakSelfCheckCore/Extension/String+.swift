@@ -10,7 +10,13 @@ import Foundation
 
 extension String {
     package func matches(pattern: String) -> Bool {
-        let predicate = NSPredicate(format: "SELF LIKE %@", pattern)
-        return predicate.evaluate(with: self)
+        do {
+            let regex = try NSRegularExpression(pattern: pattern)
+            let range = NSRange(startIndex ..< endIndex, in: self)
+            let match = regex.firstMatch(in: self, range: range)
+            return match != nil
+        } catch {
+            return false
+        }
     }
 }
