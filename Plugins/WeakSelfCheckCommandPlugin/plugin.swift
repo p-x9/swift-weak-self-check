@@ -25,10 +25,11 @@ struct WeakSelfCheckCommandPlugin: CommandPlugin {
         arguments: [String]
     ) throws {
         var argumentExtractor = ArgumentExtractor(arguments)
-        let reportType = argumentExtractor.extractOption(named: "reportType").first ?? "error"
+        let reportType = argumentExtractor.extractOption(named: "report-type").first ?? "error"
         let silent = argumentExtractor.extractFlag(named: "silent")
         let config = argumentExtractor.extractOption(named: "config").first
         ?? packageDirectory.firstConfigurationFileInParentDirectories()?.string ?? ""
+        let indexStorePath = argumentExtractor.extractOption(named: "index-store-path").first
         let _ = argumentExtractor.extractOption(named: "target")
         let path = argumentExtractor.remainingArguments.first ?? packageDirectory.string
 
@@ -46,8 +47,16 @@ struct WeakSelfCheckCommandPlugin: CommandPlugin {
             process.arguments?.append("--silent")
         }
 
+        if let indexStorePath {
+            process.arguments? += [
+                "--index-store-path",
+                indexStorePath
+            ]
+        }
+
         try process.run()
-        process.waitUntilExit()    }
+        process.waitUntilExit()
+    }
 }
 
 #if canImport(XcodeProjectPlugin)
