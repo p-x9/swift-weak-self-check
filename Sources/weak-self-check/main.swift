@@ -1,6 +1,7 @@
 import Foundation
 import ArgumentParser
 import Yams
+import SwiftIndexStore
 import WeakSelfCheckCore
 
 struct weak_self_check: ParsableCommand {
@@ -38,6 +39,16 @@ struct weak_self_check: ParsableCommand {
     var whiteList: [WhiteListElement] = []
     var excludedFiles: [String] = []
 
+    lazy var indexStore: IndexStore? = {
+        if let indexStorePath,
+           FileManager.default.fileExists(atPath: indexStorePath) {
+            let url = URL(fileURLWithPath: indexStorePath)
+            return try? .open(store: url, lib: .open())
+        } else {
+            return nil
+        }
+    }()
+
     mutating func run() throws {
         try readConfig()
 
@@ -53,7 +64,7 @@ struct weak_self_check: ParsableCommand {
 }
 
 extension weak_self_check {
-    private func check(forDirectory url: URL) throws {
+    private mutating func check(forDirectory url: URL) throws {
         let fileManager: FileManager = .default
 
         let contents = try fileManager.contentsOfDirectory(
@@ -70,7 +81,7 @@ extension weak_self_check {
             }
     }
 
-    private func check(forFile url: URL) throws {
+    private mutating func check(forFile url: URL) throws {
         guard url.pathExtension == "swift" else { return }
         guard !excludedFiles.contains(where: { url.path.matches(pattern: $0) }) else {
             return
@@ -83,7 +94,7 @@ extension weak_self_check {
             fileName: url.path,
             reportType: reportType ?? .error,
             whiteList: whiteList,
-            indexStorePath: indexStorePath ?? environmentIndexStorePath
+            indexStore: indexStore
         )
         try? checker.diagnose()
     }
