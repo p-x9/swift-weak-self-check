@@ -21,19 +21,12 @@ public final class WeakSelfChecker: SyntaxVisitor {
         fileName: String,
         reportType: ReportType = .error,
         whiteList: [WhiteListElement] = [],
-        indexStorePath: String? = nil
+        indexStore: IndexStore? = nil
     ) {
         self.fileName = fileName
         self.reportType = reportType
         self.whiteList = whiteList
-
-        if let indexStorePath,
-           FileManager.default.fileExists(atPath: indexStorePath) {
-            let url = URL(fileURLWithPath: indexStorePath)
-            indexStore = try? .open(store: url, lib: .open())
-        } else {
-            indexStore = nil
-        }
+        self.indexStore = indexStore
 
         super.init(viewMode: .all)
     }

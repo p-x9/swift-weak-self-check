@@ -45,6 +45,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Yams", package: "Yams"),
+                .product(name: "SwiftIndexStore", package: "swift-indexstore"),
                 "WeakSelfCheckCore"
             ]
         ),
