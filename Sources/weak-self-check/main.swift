@@ -40,7 +40,7 @@ struct weak_self_check: ParsableCommand {
     var excludedFiles: [String] = []
 
     lazy var indexStore: IndexStore? = {
-        if let indexStorePath,
+        if let indexStorePath = indexStorePath ?? environmentIndexStorePath,
            FileManager.default.fileExists(atPath: indexStorePath) {
             let url = URL(fileURLWithPath: indexStorePath)
             return try? .open(store: url, lib: .open())
