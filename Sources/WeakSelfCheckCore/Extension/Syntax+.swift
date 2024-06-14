@@ -81,8 +81,9 @@ extension SyntaxProtocol {
 
         for unit in units {
             let dependencies = try indexStore.recordDependencies(for: unit)
-            for dependency in dependencies where dependency.filePath == fileName {
-                guard case let .record(record) = dependency else {
+            for dependency in dependencies {
+                guard case let .record(record) = dependency,
+                      record.filePath == fileName else {
                     continue
                 }
 
