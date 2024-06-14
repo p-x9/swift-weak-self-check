@@ -77,7 +77,7 @@ extension SyntaxProtocol {
             )
         )
 
-        let units = indexStore.units()
+        let units = indexStore.units(includeSystem: false)
 
         for unit in units {
             let dependencies = try indexStore.recordDependencies(for: unit)
@@ -86,14 +86,15 @@ extension SyntaxProtocol {
                     continue
                 }
 
-                let occurrence = try indexStore.occurrences(for: record)
-                    .lazy
-                    .filter { !$0.location.isSystem }
-                    .filter {
+                let occurrence = try indexStore.occurrences(
+                    for: record
+                )
+                    .first {
                         let l = $0.location
-                        return l.line == location.line && l.column == location.column
+                        return !l.isSystem &&
+                        l.line == location.line && l.column == location.column &&
+                        $0.roles.contains([.reference, .extendedBy])
                     }
-                    .first { $0.roles.contains(.reference) && $0.roles.contains(.extendedBy) }
 
                 guard let occurrence else { return nil }
 
