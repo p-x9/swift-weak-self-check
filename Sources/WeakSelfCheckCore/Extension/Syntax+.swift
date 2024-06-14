@@ -77,42 +77,43 @@ extension SyntaxProtocol {
             )
         )
 
-        let units = indexStore.units(includeSystem: false)
+        var occurrence: IndexStoreOccurrence?
 
-        for unit in units {
-            let dependencies = try indexStore.recordDependencies(for: unit)
-            for dependency in dependencies {
+        try indexStore.forEachUnits(includeSystem: false) { unit in
+            try indexStore.forEachRecordDependencies(for: unit) { dependency in
                 guard case let .record(record) = dependency,
                       record.filePath == fileName else {
-                    continue
+                    return true
                 }
 
-                let occurrence = try indexStore.occurrences(
-                    for: record
-                )
-                    .first {
-                        let l = $0.location
-                        return !l.isSystem &&
-                        l.line == location.line && l.column == location.column &&
-                        $0.roles.contains([.reference, .extendedBy])
+                try indexStore.forEachOccurrences(for: record) {
+                    let l = $0.location
+                    if !l.isSystem,
+                       l.line == location.line && l.column == location.column,
+                       $0.roles.contains([.reference, .extendedBy]) {
+                        occurrence = $0
+                        return false
                     }
+                    return true
+                } // forEachOccurrences
 
-                guard let occurrence else { return nil }
+                return false
+            } // forEachRecordDependencies
 
-                let kind = occurrence.symbol.kind
-                let name = occurrence.symbol.name
-                switch kind {
-                case .class: return true
-                case .struct: return false
-                case .enum where name != "Optional": return false
-                case .protocol: return nil
-                default: return nil
-                }
+            return occurrence != nil
+        } // forEachUnits
 
-            }
+        guard let occurrence else { return nil }
+
+        let kind = occurrence.symbol.kind
+        let name = occurrence.symbol.name
+        switch kind {
+        case .class: return true
+        case .struct: return false
+        case .enum where name != "Optional": return false
+        case .protocol: return nil
+        default: return nil
         }
-
-        return nil
     }
 }
 
