@@ -100,7 +100,7 @@ extension SyntaxProtocol {
                 return false
             } // forEachRecordDependencies
 
-            return occurrence != nil
+            return occurrence == nil
         } // forEachUnits
 
         guard let occurrence else { return nil }
