@@ -28,7 +28,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            "509.0.0"..<"511.0.0"
+            "509.0.0"..<"601.0.0-prerelease"
         ),
         .package(
             url: "https://github.com/ileitch/swift-indexstore.git",
