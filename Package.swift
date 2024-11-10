@@ -31,8 +31,8 @@ let package = Package(
             "509.0.0"..<"601.0.0-prerelease"
         ),
         .package(
-            url: "https://github.com/ileitch/swift-indexstore.git",
-            from: "9.0.4"
+            url: "https://github.com/kateinoigakukun/swift-indexstore.git",
+            from: "0.3.0"
         ),
         .package(
             url: "https://github.com/jpsim/Yams.git",
