@@ -21,6 +21,12 @@ struct weak_self_check: ParsableCommand {
     @Option(help: "Detected as `error` or `warning` (default: error)")
     var reportType: ReportType?
 
+    @Flag(
+        name: .customLong("quick"),
+        help: "Check more quicklys. (Not accurate as indexPath is not used)"
+    )
+    var quick: Bool = false
+
     @Flag(name: .customLong("silent"), help: "Do not output logs")
     var silent: Bool = false
 
@@ -94,7 +100,7 @@ extension weak_self_check {
             fileName: url.path,
             reportType: reportType ?? .error,
             whiteList: whiteList,
-            indexStore: indexStore
+            indexStore: quick ? nil : indexStore
         )
         try? checker.diagnose()
     }
@@ -116,6 +122,9 @@ extension weak_self_check {
 
         if let slient = config.slent, slient {
             self.silent = true
+        }
+        if let quick = config.quick, quick {
+            self.quick = true
         }
         if reportType == nil {
             self.reportType = config.reportType
