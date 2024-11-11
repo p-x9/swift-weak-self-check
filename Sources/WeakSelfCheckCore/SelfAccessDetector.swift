@@ -20,9 +20,8 @@ public enum SelfAccessDetector {
 fileprivate final class _SelfAccessDetectSyntaxVisitor: SyntaxVisitor {
     public private(set) var isSelfUsed: Bool = false
 
-    override func visit(_ node: MemberAccessExprSyntax) -> SyntaxVisitorContinueKind {
-        if let base = node.base?.as(DeclReferenceExprSyntax.self),
-           base.baseName.tokenKind == .keyword(.`self`) {
+    override func visit(_ node: DeclReferenceExprSyntax) -> SyntaxVisitorContinueKind {
+        if node.baseName.tokenKind == .keyword(.`self`) {
             isSelfUsed = true
             return .skipChildren
         }

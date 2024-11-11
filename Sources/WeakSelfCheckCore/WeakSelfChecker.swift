@@ -36,6 +36,40 @@ public final class WeakSelfChecker: SyntaxVisitor {
             return .visitChildren
         }
 
+        func hasEscaping(
+            for label: String?,
+            isTrailing: Bool = false
+        ) -> Bool {
+            guard let funcDecl = try? functionDecl(for: node) else {
+                return true
+            }
+            let parameters = funcDecl.signature.parameterClause.parameters
+
+            var parameter: FunctionParameterSyntax?
+
+            if let label {
+                parameter = parameters.first(where: {
+                    $0.secondName?.trimmedDescription == label ||
+                    $0.firstName.trimmedDescription == label
+                })
+            } else if parameters.count(where: \.isFunctionType) == 1 {
+                parameter = parameters.first(where: {
+                    $0.isFunctionType
+                })
+            }
+            // TODO: Handle function which has multiple closures without label
+
+            guard let parameter else { return true }
+
+            if parameter.isFunctionType,
+               !parameter.type.isOptionalType,
+               !parameter.isEscaping {
+                return false
+            }
+
+            return true
+        }
+
 #if canImport(SwiftSyntax510)
         let arguments = node.arguments
 #else
@@ -46,20 +80,23 @@ public final class WeakSelfChecker: SyntaxVisitor {
             guard let closure = argument.expression.as(ClosureExprSyntax.self) else {
                 continue
             }
-            if !ClosureWeakSelfChecker.check(closure, in: fileName, indexStore: indexStore) {
+            if !ClosureWeakSelfChecker.check(closure, in: fileName, indexStore: indexStore),
+               hasEscaping(for: argument.label?.trimmedDescription) {
                 report(for: closure)
             }
         }
 
         // Check trailing closure
         if let trailingClosure = node.trailingClosure,
-           !ClosureWeakSelfChecker.check(trailingClosure, in: fileName, indexStore: indexStore) {
+           !ClosureWeakSelfChecker.check(trailingClosure, in: fileName, indexStore: indexStore),
+           hasEscaping(for: nil, isTrailing: true) {
             report(for: trailingClosure)
         }
 
         // Check additional trailing closures
         for closure in node.additionalTrailingClosures {
-            if !ClosureWeakSelfChecker.check(closure.closure, in: fileName, indexStore: indexStore) {
+            if !ClosureWeakSelfChecker.check(closure.closure, in: fileName, indexStore: indexStore),
+               hasEscaping(for: closure.label.trimmedDescription, isTrailing: true) {
                 report(for: closure.closure)
             }
         }
@@ -123,5 +160,67 @@ extension WeakSelfChecker {
         }
 
         return false
+    }
+}
+
+extension WeakSelfChecker {
+    private func functionDecl(for callExpr: FunctionCallExprSyntax) throws -> FunctionDeclSyntax? {
+        guard let occurrence = try functionCallOccurrence(for: callExpr) else {
+            return nil
+        }
+
+        var calledExpression = callExpr.calledExpression
+        if let member = calledExpression.as(MemberAccessExprSyntax.self) {
+            calledExpression = ExprSyntax(member.declName)
+        }
+        return occurrence.symbol.functionDecl(
+            calledExpression.trimmedDescription
+        )
+    }
+
+    private func functionCallOccurrence(for callExpr: FunctionCallExprSyntax) throws -> IndexStoreOccurrence? {
+        guard let indexStore else { return nil }
+
+        var calledExpression = callExpr.calledExpression
+
+        if let member = calledExpression.as(MemberAccessExprSyntax.self) {
+            calledExpression = ExprSyntax(member.declName)
+        }
+
+        let location = calledExpression.startLocation(
+            converter: .init(
+                fileName: fileName,
+                tree: calledExpression.root
+            )
+        )
+
+        var occurrence: IndexStoreOccurrence?
+
+        try indexStore.forEachUnits(includeSystem: false) { unit in
+            try indexStore.forEachRecordDependencies(for: unit) { dependency in
+                guard case let .record(record) = dependency,
+                      record.filePath == fileName else {
+                    return true
+                }
+
+                try indexStore.forEachOccurrences(for: record) {
+                    let l = $0.location
+                    if !l.isSystem,
+                       l.line == location.line && l.column == location.column,
+                       $0.roles.contains([.reference, .call]),
+                       [.instanceMethod, .classMethod, .staticMethod, .constructor, .function, .conversionFunction].contains($0.symbol.kind) {
+                        occurrence = $0
+                        return false
+                    }
+                    return true
+                } // forEachOccurrences
+
+                return false
+            } // forEachRecordDependencies
+
+            return occurrence == nil
+        } // forEachUnits
+
+        return occurrence
     }
 }
