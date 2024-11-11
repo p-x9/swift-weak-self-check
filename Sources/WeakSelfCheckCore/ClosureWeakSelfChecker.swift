@@ -56,7 +56,7 @@ fileprivate final class _ClosureWeakSelfCheckerSyntaxVisitor: SyntaxVisitor {
 
         // Check if `self` or ``self`` is included in parameter list
         if let parameterClause {
-            if let items = parameterClause.as(ClosureParameterListSyntax.self),
+            if let items = parameterClause.as(ClosureParameterClauseSyntax.self)?.parameters,
                items.contains(where: {
                    if let secondName = $0.secondName {
                        return secondName.tokenKind.isSelf
