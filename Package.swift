@@ -54,7 +54,8 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftIndexStore", package: "swift-indexstore")
+                .product(name: "SwiftIndexStore", package: "swift-indexstore"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ]
         ),
         .plugin(
