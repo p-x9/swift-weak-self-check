@@ -13,7 +13,7 @@ import SwiftParser
 import SwiftSyntaxBuilder
 
 extension IndexStoreSymbol {
-    var demangledSymbol: String? {
+    var demangledName: String? {
         guard let usr else { return nil }
 
         // swift symbol
@@ -47,7 +47,7 @@ extension IndexStoreSymbol {
     }
 
     private func _functionDeclString(_ name: String) -> String? {
-        guard var string = demangledSymbol else { return nil }
+        guard var string = demangledName else { return nil }
 
         if string.starts(with: "c:") { return nil }
 
