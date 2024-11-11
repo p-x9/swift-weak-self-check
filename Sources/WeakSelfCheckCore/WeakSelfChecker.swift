@@ -62,6 +62,7 @@ public final class WeakSelfChecker: SyntaxVisitor {
             guard let parameter else { return true }
 
             if parameter.isFunctionType,
+               !parameter.type.isOptionalType,
                !parameter.isEscaping {
                 return false
             }
