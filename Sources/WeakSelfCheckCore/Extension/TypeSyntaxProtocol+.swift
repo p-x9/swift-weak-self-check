@@ -61,10 +61,10 @@ extension TypeSyntaxProtocol {
 
 extension TypeSyntaxProtocol {
     var isOptionalType: Bool {
-        if let type = self.as(OptionalTypeSyntax.self) {
+        if self.as(OptionalTypeSyntax.self) != nil {
             return true
         }
-        if let type = self.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+        if self.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) != nil {
             return true
         }
         if let type = self.as(MemberTypeSyntax.self),

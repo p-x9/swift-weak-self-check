@@ -70,13 +70,7 @@ public final class WeakSelfChecker: SyntaxVisitor {
             return true
         }
 
-#if canImport(SwiftSyntax510)
-        let arguments = node.arguments
-#else
-        let arguments = node.argumentList
-#endif
-
-        for argument in arguments {
+        for argument in node.arguments {
             guard let closure = argument.expression.as(ClosureExprSyntax.self) else {
                 continue
             }
