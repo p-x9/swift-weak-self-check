@@ -20,7 +20,14 @@ extension TypeSyntaxProtocol {
             if type.name.tokenKind == .identifier("Optional"),
                let genericArgumentClause = type.genericArgumentClause,
                let argument = genericArgumentClause.arguments.first {
+#if canImport(SwiftSyntax601)
+                if case let .type(type) = argument.argument {
+                    return type.isFunctionType
+                }
+                return false
+#else
                 return argument.argument.isFunctionType
+#endif
             }
             return type.baseType.isFunctionType
         }
@@ -38,7 +45,14 @@ extension TypeSyntaxProtocol {
            type.name.tokenKind == .identifier("Optional"),
            let genericArgumentClause = type.genericArgumentClause,
            let argument = genericArgumentClause.arguments.first {
-            return argument.argument.isFunctionType
+#if canImport(SwiftSyntax601)
+                if case let .type(type) = argument.argument {
+                    return type.isFunctionType
+                }
+            return false
+#else
+                return argument.argument.isFunctionType
+#endif
         }
 
         return false
