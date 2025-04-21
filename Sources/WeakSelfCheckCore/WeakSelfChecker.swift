@@ -14,17 +14,20 @@ import SwiftIndexStore
 public final class WeakSelfChecker: SyntaxVisitor {
     public let fileName: String
     public let reportType: ReportType
+    public let reporter: any ReporterProtocol
     public let whiteList: [WhiteListElement]
     public let indexStore: IndexStore?
 
     public init(
         fileName: String,
         reportType: ReportType = .error,
+        reporter: any ReporterProtocol = XcodeReporter(),
         whiteList: [WhiteListElement] = [],
         indexStore: IndexStore? = nil
     ) {
         self.fileName = fileName
         self.reportType = reportType
+        self.reporter = reporter
         self.whiteList = whiteList
         self.indexStore = indexStore
 
@@ -99,8 +102,12 @@ public final class WeakSelfChecker: SyntaxVisitor {
     }
 
     public func diagnose() throws {
-        let input = try String(contentsOfFile: fileName)
-        let syntax: SourceFileSyntax = Parser.parse(source: input)
+        let source = try String(contentsOfFile: fileName)
+        try diagnose(source: source)
+    }
+
+    internal func diagnose(source: String) throws {
+        let syntax: SourceFileSyntax = Parser.parse(source: source)
         self.walk(syntax)
     }
 }
@@ -113,7 +120,7 @@ extension WeakSelfChecker {
                 tree: closure.root
             )
         )
-        Reporter.report(
+        reporter.report(
             file: fileName,
             line: location.line,
             character: location.column,

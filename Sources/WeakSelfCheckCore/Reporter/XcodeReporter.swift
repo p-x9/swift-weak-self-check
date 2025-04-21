@@ -8,8 +8,10 @@
 
 import Foundation
 
-enum Reporter {
-    static func report(
+public struct XcodeReporter: ReporterProtocol {
+    public init() {}
+    
+    public func report(
         file: String,
         line: Int,
         character: Int? = nil,
