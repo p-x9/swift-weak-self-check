@@ -9,7 +9,6 @@
 import Foundation
 import SwiftIndexStore
 import SwiftSyntax
-import SwiftParser
 import SwiftSyntaxBuilder
 
 extension IndexStoreSymbol {

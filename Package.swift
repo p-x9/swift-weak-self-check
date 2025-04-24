@@ -77,6 +77,14 @@ let package = Package(
             dependencies: [
                 "weak-self-check"
             ]
+        ),
+        .testTarget(
+            name: "WeakSelfCheckCoreTests",
+            dependencies: [
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+                "WeakSelfCheckCore"
+            ]
         )
     ]
 )
