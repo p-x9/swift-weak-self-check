@@ -8,6 +8,7 @@
 
 import Foundation
 import ArgumentParser
+import SourceReporter
 import WeakSelfCheckCore
 
-extension ReportType: ExpressibleByArgument {}
+extension ReportType: @retroactive ExpressibleByArgument {}

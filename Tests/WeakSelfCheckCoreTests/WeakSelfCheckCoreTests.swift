@@ -9,6 +9,7 @@
 import XCTest
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import SourceReporter
 @testable import WeakSelfCheckCore
 
 final class WeakSelfCheckCoreTests: XCTestCase {
@@ -33,7 +34,7 @@ extension WeakSelfCheckCoreTests {
                     position: .init(
                         file: #fileID,
                         line: 3,
-                        character: 38
+                        column: 38
                     ),
                     type: .error,
                     content: defaultMessage
@@ -87,7 +88,7 @@ extension WeakSelfCheckCoreTests {
                     position: .init(
                         file: #fileID,
                         line: 4,
-                        character: 42
+                        column: 42
                     ),
                     type: .error,
                     content: defaultMessage
@@ -158,7 +159,7 @@ extension WeakSelfCheckCoreTests {
                     position: .init(
                         file: #fileID,
                         line: 3,
-                        character: 38
+                        column: 38
                     ),
                     type: .error,
                     content: defaultMessage
