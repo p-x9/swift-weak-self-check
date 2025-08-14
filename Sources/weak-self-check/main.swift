@@ -2,6 +2,7 @@ import Foundation
 import ArgumentParser
 import Yams
 import SwiftIndexStore
+import SourceReporter
 import WeakSelfCheckCore
 
 struct weak_self_check: ParsableCommand {

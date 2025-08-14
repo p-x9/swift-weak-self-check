@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 
 import PackageDescription
 
@@ -38,6 +38,10 @@ let package = Package(
             url: "https://github.com/jpsim/Yams.git",
             from: "5.0.1"
         ),
+        .package(
+            url: "https://github.com/p-x9/swift-source-reporter.git",
+            from: "0.2.0"
+        ),
     ],
     targets: [
         .executableTarget(
@@ -56,6 +60,7 @@ let package = Package(
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftIndexStore", package: "swift-indexstore"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+                .product(name: "SourceReporter", package: "swift-source-reporter"),
             ]
         ),
         .plugin(

@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "swift-source-reporter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/p-x9/swift-source-reporter.git",
+      "state" : {
+        "revision" : "702db03a2b7277e89f5859dd7b260160636d1187",
+        "version" : "0.2.0"
+      }
+    },
+    {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax.git",

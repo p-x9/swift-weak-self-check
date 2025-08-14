@@ -10,6 +10,7 @@ import Foundation
 import SwiftParser
 import SwiftSyntax
 import SwiftIndexStore
+import SourceReporter
 
 public final class WeakSelfChecker: SyntaxVisitor {
     public let fileName: String
@@ -123,7 +124,7 @@ extension WeakSelfChecker {
         reporter.report(
             file: fileName,
             line: location.line,
-            character: location.column,
+            column: location.column,
             type: reportType,
             content: "Use `[weak self]` to avoid memory leaks"
         )

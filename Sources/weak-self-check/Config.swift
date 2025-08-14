@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SourceReporter
 import WeakSelfCheckCore
 
 public struct Config: Codable {
