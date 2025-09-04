@@ -13,33 +13,33 @@ import PackagePlugin
 struct WeakSelfCheckBuildToolPlugin: BuildToolPlugin {
     func createBuildCommands(context: PackagePlugin.PluginContext, target: PackagePlugin.Target) async throws -> [PackagePlugin.Command] {
         createBuildCommands(
-            packageDirectory: context.package.directory,
-            workingDirectory: context.pluginWorkDirectory,
+            packageDirectory: context.package.directoryURL,
+            workingDirectory: context.pluginWorkDirectoryURL,
             tool: try context.tool(named: "weak-self-check")
         )
     }
 
     private func createBuildCommands(
-        packageDirectory: Path,
-        workingDirectory: Path,
+        packageDirectory: URL,
+        workingDirectory: URL,
         tool: PluginContext.Tool
     ) -> [Command] {
         let configuration = packageDirectory.firstConfigurationFileInParentDirectories()
 
         var arguments = [
-            packageDirectory.string
+            packageDirectory.path
         ]
 
         if let configuration {
             arguments += [
-                "--config", configuration.string
+                "--config", configuration.path
             ]
         }
 
         return [
             .buildCommand(
                 displayName: "WeakSelfCheckBuildToolPlugin",
-                executable: tool.path,
+                executable: tool.url,
                 arguments: arguments
             )
         ]
@@ -52,8 +52,8 @@ import XcodeProjectPlugin
 extension WeakSelfCheckBuildToolPlugin: XcodeBuildToolPlugin {
     func createBuildCommands(context: XcodePluginContext, target: XcodeTarget) throws -> [Command] {
         return createBuildCommands(
-            packageDirectory: context.xcodeProject.directory,
-            workingDirectory: context.pluginWorkDirectory,
+            packageDirectory: context.xcodeProject.directoryURL,
+            workingDirectory: context.pluginWorkDirectoryURL,
             tool: try context.tool(named: "weak-self-check")
         )
     }
@@ -61,27 +61,27 @@ extension WeakSelfCheckBuildToolPlugin: XcodeBuildToolPlugin {
 #endif
 
 // ref: https://github.com/realm/SwiftLint/blob/main/Plugins/SwiftLintPlugin/Path%2BHelpers.swift
-extension Path {
-    func firstConfigurationFileInParentDirectories() -> Path? {
+extension URL {
+    func firstConfigurationFileInParentDirectories() -> URL? {
         let defaultConfigurationFileNames = [
             ".swift-weak-self-check.yml"
         ]
         let proposedDirectories = sequence(
             first: self,
             next: { path in
-                guard path.stem.count > 1 else {
+                guard path.pathComponents.count > 1 else {
                     // Check we're not at the root of this filesystem, as `removingLastComponent()`
                     // will continually return the root from itself.
                     return nil
                 }
 
-                return path.removingLastComponent()
+                return path.deletingLastPathComponent()
             }
         )
 
         for proposedDirectory in proposedDirectories {
             for fileName in defaultConfigurationFileNames {
-                let potentialConfigurationFile = proposedDirectory.appending(subpath: fileName)
+                let potentialConfigurationFile = proposedDirectory.appending(path: fileName)
                 if potentialConfigurationFile.isAccessible() {
                     return potentialConfigurationFile
                 }
@@ -92,7 +92,7 @@ extension Path {
 
     /// Safe way to check if the file is accessible from within the current process sandbox.
     private func isAccessible() -> Bool {
-        let result = string.withCString { pointer in
+        let result = path.withCString { pointer in
             access(pointer, R_OK)
         }
 

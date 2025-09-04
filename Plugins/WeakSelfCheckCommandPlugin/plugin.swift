@@ -13,14 +13,14 @@ import PackagePlugin
 struct WeakSelfCheckCommandPlugin: CommandPlugin {
     func performCommand(context: PackagePlugin.PluginContext, arguments: [String]) async throws {
         try performCommand(
-            packageDirectory: context.package.directory,
+            packageDirectory: context.package.directoryURL,
             tool: try context.tool(named: "weak-self-check"),
             arguments: arguments
         )
     }
 
     private func performCommand(
-        packageDirectory: Path,
+        packageDirectory: URL,
         tool: PluginContext.Tool,
         arguments: [String]
     ) throws {
@@ -28,13 +28,13 @@ struct WeakSelfCheckCommandPlugin: CommandPlugin {
         let reportType = argumentExtractor.extractOption(named: "report-type").first ?? "error"
         let silent = argumentExtractor.extractFlag(named: "silent")
         let config = argumentExtractor.extractOption(named: "config").first
-        ?? packageDirectory.firstConfigurationFileInParentDirectories()?.string ?? ""
+        ?? packageDirectory.firstConfigurationFileInParentDirectories()?.path ?? ""
         let indexStorePath = argumentExtractor.extractOption(named: "index-store-path").first
         let _ = argumentExtractor.extractOption(named: "target")
-        let path = argumentExtractor.remainingArguments.first ?? packageDirectory.string
+        let path = argumentExtractor.remainingArguments.first ?? packageDirectory.path
 
         let process = Process()
-        process.launchPath = tool.path.string
+        process.launchPath = tool.url.path
         process.arguments = [
             path,
             "--config",
@@ -65,7 +65,7 @@ import XcodeProjectPlugin
 extension WeakSelfCheckCommandPlugin: XcodeCommandPlugin {
     func performCommand(context: XcodeProjectPlugin.XcodePluginContext, arguments: [String]) throws {
         try performCommand(
-            packageDirectory: context.xcodeProject.directory,
+            packageDirectory: context.xcodeProject.directoryURL,
             tool: try context.tool(named: "weak-self-check"),
             arguments: arguments
         )
@@ -74,27 +74,27 @@ extension WeakSelfCheckCommandPlugin: XcodeCommandPlugin {
 #endif
 
 // ref: https://github.com/realm/SwiftLint/blob/main/Plugins/SwiftLintPlugin/Path%2BHelpers.swift
-extension Path {
-    func firstConfigurationFileInParentDirectories() -> Path? {
+extension URL {
+    func firstConfigurationFileInParentDirectories() -> URL? {
         let defaultConfigurationFileNames = [
             ".swift-weak-self-check.yml"
         ]
         let proposedDirectories = sequence(
             first: self,
             next: { path in
-                guard path.stem.count > 1 else {
+                guard path.pathComponents.count > 1 else {
                     // Check we're not at the root of this filesystem, as `removingLastComponent()`
                     // will continually return the root from itself.
                     return nil
                 }
 
-                return path.removingLastComponent()
+                return path.deletingLastPathComponent()
             }
         )
 
         for proposedDirectory in proposedDirectories {
             for fileName in defaultConfigurationFileNames {
-                let potentialConfigurationFile = proposedDirectory.appending(subpath: fileName)
+                let potentialConfigurationFile = proposedDirectory.appending(path: fileName)
                 if potentialConfigurationFile.isAccessible() {
                     return potentialConfigurationFile
                 }
@@ -105,7 +105,7 @@ extension Path {
 
     /// Safe way to check if the file is accessible from within the current process sandbox.
     private func isAccessible() -> Bool {
-        let result = string.withCString { pointer in
+        let result = path.withCString { pointer in
             access(pointer, R_OK)
         }
 
