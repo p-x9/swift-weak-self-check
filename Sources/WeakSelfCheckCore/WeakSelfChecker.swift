@@ -199,6 +199,9 @@ extension WeakSelfChecker {
         var occurrence: IndexStoreOccurrence?
 
         try indexStore.forEachUnits(includeSystem: false) { unit in
+            let mainFilePath = try indexStore.mainFilePath(for: unit)
+            guard mainFilePath == fileName else { return true }
+
             try indexStore.forEachRecordDependencies(for: unit) { dependency in
                 guard case let .record(record) = dependency,
                       record.filePath == fileName else {
